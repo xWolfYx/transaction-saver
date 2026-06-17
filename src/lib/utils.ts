@@ -3,6 +3,11 @@ import type { Checkout } from '../types';
 
 // --- Formatting ---
 
+/** Convert tetri to GEL string: 150 → "₾ 1.50" */
+export function formatGEL(amount: number): string {
+	return `₾ ${(amount / GEL_DIVISOR).toFixed(2)}`;
+}
+
 export function formatDate(isoString: string): string {
 	const instant = Temporal.Instant.from(isoString);
 	const zoned = instant.toZonedDateTimeISO(Temporal.Now.timeZoneId());
