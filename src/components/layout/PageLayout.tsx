@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 interface PageLayoutProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 export function PageLayout({ children }: PageLayoutProps) {
-  return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>;
+	return (
+		<main className="mx-auto px-4 sm:px-6 py-8 max-w-6xl">{children}</main>
+	);
 }
