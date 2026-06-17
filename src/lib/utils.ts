@@ -1,5 +1,5 @@
-import { Temporal } from 'temporal-polyfill';
-import type { Checkout } from '../types';
+import { Temporal } from "temporal-polyfill";
+import { GEL_DIVISOR, type Checkout } from "../types";
 
 // --- Formatting ---
 
@@ -11,12 +11,12 @@ export function formatGEL(amount: number): string {
 export function formatDate(isoString: string): string {
 	const instant = Temporal.Instant.from(isoString);
 	const zoned = instant.toZonedDateTimeISO(Temporal.Now.timeZoneId());
-	return zoned.toLocaleString('en-GB', {
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
+	return zoned.toLocaleString("en-GB", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
 	});
 }
 
@@ -44,16 +44,17 @@ export function parsePlainDate(dateString: string): Temporal.PlainDate {
 
 // --- Date range helpers ---
 
-export function getDateRange(
-	preset: 'today' | 'week' | 'month',
-): { from: Temporal.PlainDate; to: Temporal.PlainDate } {
+export function getDateRange(preset: "today" | "week" | "month"): {
+	from: Temporal.PlainDate;
+	to: Temporal.PlainDate;
+} {
 	const t = today();
 
 	switch (preset) {
-		case 'today':
+		case "today":
 			return { from: t, to: t.add({ days: 1 }) };
 
-		case 'week': {
+		case "week": {
 			// Monday = 1 ... Sunday = 7
 			const dayOfWeek = t.dayOfWeek;
 			const mondayOffset = dayOfWeek === 7 ? -6 : 1 - dayOfWeek;
@@ -61,7 +62,7 @@ export function getDateRange(
 			return { from: monday, to: monday.add({ days: 7 }) };
 		}
 
-		case 'month': {
+		case "month": {
 			const firstOfMonth = t.with({ day: 1 });
 			const firstOfNextMonth = firstOfMonth.add({ months: 1 });
 			return { from: firstOfMonth, to: firstOfNextMonth };
@@ -72,7 +73,7 @@ export function getDateRange(
 // --- Filtering & grouping ---
 
 /** Extract YYYY-MM-DD from any ISO 8601 string so PlainDate.from() can parse it. */
-function dateKey(isoString: string): string {
+export function dateKey(isoString: string): string {
 	return isoString.slice(0, 10);
 }
 
@@ -83,7 +84,10 @@ export function filterByDateRange(
 ): Checkout[] {
 	return checkouts.filter((c) => {
 		const checkoutDate = Temporal.PlainDate.from(dateKey(c.timestamp));
-		return Temporal.PlainDate.compare(checkoutDate, from) >= 0 && Temporal.PlainDate.compare(checkoutDate, to) < 0;
+		return (
+			Temporal.PlainDate.compare(checkoutDate, from) >= 0 &&
+			Temporal.PlainDate.compare(checkoutDate, to) < 0
+		);
 	});
 }
 
@@ -98,7 +102,10 @@ export function groupByDay(checkouts: Checkout[]): Record<string, Checkout[]> {
 }
 
 /** Generate an array of PlainDate for each day in the range [from, to) */
-export function eachDayInRange(from: Temporal.PlainDate, to: Temporal.PlainDate): Temporal.PlainDate[] {
+export function eachDayInRange(
+	from: Temporal.PlainDate,
+	to: Temporal.PlainDate,
+): Temporal.PlainDate[] {
 	const days: Temporal.PlainDate[] = [];
 	let current = from;
 	while (Temporal.PlainDate.compare(current, to) < 0) {
@@ -111,16 +118,21 @@ export function eachDayInRange(from: Temporal.PlainDate, to: Temporal.PlainDate)
 // --- CSV ---
 
 export function generateCSV(checkouts: Checkout[]): string {
-	const header = 'ID,Method,Amount (GEL),Timestamp\n';
-	const rows = checkouts.map((c) => `${c.id},${c.method},${c.amount.toFixed(2)},${c.timestamp}`).join('\n');
+	const header = "ID,Method,Amount (GEL),Timestamp\n";
+	const rows = checkouts
+		.map(
+			(c) =>
+				`${c.id},${c.method},${(c.amount / GEL_DIVISOR).toFixed(2)},${c.timestamp}`,
+		)
+		.join("\n");
 	return header + rows;
 }
 
 export function downloadCSV(checkouts: Checkout[], filename: string): void {
 	const csv = generateCSV(checkouts);
-	const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+	const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 	const url = URL.createObjectURL(blob);
-	const link = document.createElement('a');
+	const link = document.createElement("a");
 	link.href = url;
 	link.download = filename;
 	link.click();
