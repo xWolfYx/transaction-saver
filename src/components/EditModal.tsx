@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
-import { PAYMENT_METHOD, type PaymentMethod, type Checkout } from "../types";
+import { GEL_DIVISOR, PAYMENT_METHOD, type PaymentMethod, type Checkout } from "../types";
 
 interface EditModalProps {
 	checkout: Checkout;
@@ -29,7 +29,7 @@ function toLocalDatetime(isoString: string): string {
 
 export function EditModal({ checkout, onSave, onClose }: EditModalProps) {
 	const [method, setMethod] = useState<PaymentMethod>(checkout.method);
-	const [amount, setAmount] = useState(String(checkout.amount));
+	const [amount, setAmount] = useState((checkout.amount / GEL_DIVISOR).toFixed(2));
 	const [datetime, setDatetime] = useState(toLocalDatetime(checkout.timestamp));
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -40,7 +40,7 @@ export function EditModal({ checkout, onSave, onClose }: EditModalProps) {
 		onSave({
 			...checkout,
 			method,
-			amount: parsedAmount,
+			amount: Math.round(parsedAmount * GEL_DIVISOR),
 			timestamp: new Date(datetime).toISOString(),
 		});
 	};

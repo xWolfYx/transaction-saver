@@ -5,7 +5,7 @@ import { ExportButton } from "../components/ExportButton";
 import { PageLayout } from "../components/layout/PageLayout";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { showToast } from "../lib/toast";
-import type { Checkout } from "../types";
+import { GEL_DIVISOR, type Checkout } from "../types";
 
 export function LogPage() {
 	const [checkouts, setCheckouts] = useLocalStorage<Checkout[]>(
@@ -20,7 +20,7 @@ export function LogPage() {
 		};
 		setCheckouts((prev) => [newCheckout, ...prev]);
 		showToast.success(
-			`${newCheckout.method} — ₾${newCheckout.amount.toFixed(2)} logged`,
+			`${newCheckout.method} — ₾${(newCheckout.amount / GEL_DIVISOR).toFixed(2)} logged`,
 		);
 	};
 

@@ -1,3 +1,4 @@
+import { formatGEL } from "../lib/utils";
 import { StatCard } from "./ui/StatCard";
 import type { Checkout } from "../types";
 
@@ -21,25 +22,25 @@ export function Stats({ checkouts }: StatsProps) {
 		<div className="gap-4 grid grid-cols-2 lg:grid-cols-4">
 			<StatCard
 				label="Total"
-				value={`₾ ${totalAmount.toFixed(2)}`}
+				value={formatGEL(totalAmount)}
 				accent="text-slate-900"
 				icon={<span className="text-lg">💰</span>}
 			/>
 			<StatCard
 				label="Cash"
-				value={`₾ ${cashAmount.toFixed(2)}`}
+				value={formatGEL(cashAmount)}
 				accent="text-success-600"
 				icon={<span className="text-lg">💵</span>}
 			/>
 			<StatCard
 				label="Card"
-				value={`₾ ${cardAmount.toFixed(2)}`}
+				value={formatGEL(cardAmount)}
 				accent="text-brand-600"
 				icon={<span className="text-lg">💳</span>}
 			/>
 			<StatCard
 				label="Transfer"
-				value={`₾ ${transferAmount.toFixed(2)}`}
+				value={formatGEL(transferAmount)}
 				accent="text-warn-600"
 				icon={<span className="text-lg">🏦</span>}
 			/>

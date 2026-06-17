@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";
 import { Input } from "./ui/Input";
-import { PAYMENT_METHOD, type PaymentMethod, type Checkout } from "../types";
+import { GEL_DIVISOR, PAYMENT_METHOD, type PaymentMethod, type Checkout } from "../types";
 
 interface CheckoutFormProps {
 	onSubmit: (checkout: Omit<Checkout, "id">) => void;
@@ -38,7 +38,7 @@ export function CheckoutForm({ onSubmit }: CheckoutFormProps) {
 
 		onSubmit({
 			method: selected,
-			amount: parsedAmount,
+			amount: Math.round(parsedAmount * GEL_DIVISOR),
 			timestamp: new Date(datetime).toISOString(),
 		});
 

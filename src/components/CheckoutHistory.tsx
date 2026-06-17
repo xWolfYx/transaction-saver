@@ -3,7 +3,7 @@ import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 import { EditModal } from "./EditModal";
-import { formatDate } from "../lib/utils";
+import { formatDate, formatGEL } from "../lib/utils";
 import type { Checkout } from "../types";
 
 interface CheckoutHistoryProps {
@@ -69,7 +69,7 @@ export function CheckoutHistory({
 										<Badge method={checkout.method} />
 									</td>
 									<td className="px-6 py-3.5 font-semibold tabular-nums text-slate-900 text-right">
-										₾ {checkout.amount.toFixed(2)}
+										{formatGEL(checkout.amount)}
 									</td>
 									<td className="px-6 py-3.5">
 										<div className="flex justify-end items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
