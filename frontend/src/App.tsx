@@ -1,8 +1,8 @@
-import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { Route, Routes } from "react-router-dom";
 import { Navigation } from "./components/layout/Navigation";
-import { LogPage } from "./pages/LogPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { LogPage } from "./pages/LogPage";
 
 function App() {
 	return (
