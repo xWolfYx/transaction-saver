@@ -1,10 +1,10 @@
+import type { Checkout } from "@transaction-saver/shared";
 import { useState } from "react";
+import { formatDate, formatGEL } from "../lib/utils";
+import { EditModal } from "./EditModal";
+import { Badge } from "./ui/Badge";
 import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";
-import { Badge } from "./ui/Badge";
-import { EditModal } from "./EditModal";
-import { formatDate, formatGEL } from "../lib/utils";
-import type { Checkout } from "../types";
 
 interface CheckoutHistoryProps {
 	checkouts: Checkout[];

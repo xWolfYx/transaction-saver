@@ -1,6 +1,6 @@
-import { Button } from "./ui/Button";
+import type { Checkout } from "@transaction-saver/shared";
 import { downloadCSV } from "../lib/utils";
-import type { Checkout } from "../types";
+import { Button } from "./ui/Button";
 
 interface ExportButtonProps {
 	checkouts: Checkout[];

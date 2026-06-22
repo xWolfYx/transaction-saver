@@ -1,6 +1,6 @@
+import type { Checkout } from "@transaction-saver/shared";
 import { formatGEL } from "../lib/utils";
 import { StatCard } from "./ui/StatCard";
-import type { Checkout } from "../types";
 
 interface StatsProps {
 	checkouts: Checkout[];
