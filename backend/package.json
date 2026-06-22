@@ -1,0 +1,32 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "tsx watch app.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.8.0",
+			"onFail": "download"
+		}
+	},
+	"type": "module",
+	"dependencies": {
+    "@transaction-saver/shared": "workspace:*",
+		"@types/cors": "^2.8.19",
+		"cors": "^2.8.6",
+		"express": "^5.2.1"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.6",
+		"@types/node": "^26.0.0",
+		"tsx": "^4.22.4",
+		"typescript": "^6.0.3"
+	}
+}
