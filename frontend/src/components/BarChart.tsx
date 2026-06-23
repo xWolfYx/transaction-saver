@@ -14,12 +14,14 @@ import {
 	groupByDay,
 	toISOString,
 } from "../lib/utils";
+import type { DatePreset } from "../lib/utils";
 import type { Checkout, PaymentMethod } from "@tally/shared";
 import { Card } from "./ui/Card";
 
 interface BarChartProps {
 	checkouts: Checkout[];
 	range: { from: Temporal.PlainDate; to: Temporal.PlainDate };
+	preset: DatePreset;
 }
 
 const barConfig: Record<PaymentMethod, { fill: string; label: string }> = {
@@ -38,70 +40,170 @@ type ChartDataPoint = {
 	transfer: number;
 };
 
-function buildChartData(
-	days: Temporal.PlainDate[],
-	grouped: Record<string, Checkout[]>,
-	dayCount: number,
-): ChartDataPoint[] {
-	if (dayCount <= 31) {
-		return days.map((day) => {
-			const key = toISOString(day);
-			const checkouts = grouped[key] ?? [];
-			return {
-				id: key,
-				label: day.toLocaleString("en-GB", {
-					day: "2-digit",
-					month: "2-digit",
-				}),
-				cash: sumByMethod(checkouts, "cash"),
-				card: sumByMethod(checkouts, "card"),
-				transfer: sumByMethod(checkouts, "transfer"),
-			};
-		});
-	}
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_NAMES = [
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
-	// Weekly bucketing
-	const weeks = new Map<string, Checkout[]>();
-	for (const day of days) {
-		const w = weekKey(day);
-		if (!weeks.has(w)) weeks.set(w, []);
-	}
-	for (const [dayKey, dayCheckouts] of Object.entries(grouped)) {
-		if (dayCheckouts.length === 0) continue;
-		const cd = Temporal.PlainDate.from(dayKey);
-		const w = weekKey(cd);
-		weeks.get(w)?.push(...dayCheckouts);
-	}
-
-	return [...weeks.entries()]
-		.sort(([a], [b]) => a.localeCompare(b))
-		.map(([key, checkouts]) => {
-			const [, weekNum] = key.split("-W");
-			return {
-				id: key,
-				label: `W${weekNum}`,
-				cash: sumByMethod(checkouts, "cash"),
-				card: sumByMethod(checkouts, "card"),
-				transfer: sumByMethod(checkouts, "transfer"),
-			};
-		});
-}
-
-function sumByMethod(checkouts: Checkout[], method: PaymentMethod): number {
+function sumByMethod(
+	checkouts: Checkout[],
+	method: PaymentMethod,
+): number {
 	return checkouts
 		.filter((c) => c.method === method)
 		.reduce((sum, c) => sum + c.amount, 0);
 }
 
-function weekKey(day: Temporal.PlainDate): string {
-	const firstJan = Temporal.PlainDate.from({
-		year: day.year,
-		month: 1,
-		day: 1,
+function buildHourlyData(checkouts: Checkout[]): ChartDataPoint[] {
+	if (checkouts.length === 0) return [];
+
+	let minTs = Infinity;
+	let maxTs = -Infinity;
+	for (const c of checkouts) {
+		const ts = new Date(c.timestamp).getTime();
+		if (ts < minTs) minTs = ts;
+		if (ts > maxTs) maxTs = ts;
+	}
+
+	const minDate = new Date(minTs);
+	const maxDate = new Date(maxTs);
+
+	const start = Math.max(0, minDate.getHours() - 1);
+	const end = Math.min(23, maxDate.getHours() + 1);
+	const count = end - start + 1;
+
+	const buckets = new Map<number, Checkout[]>();
+	for (let h = start; h <= end; h++) buckets.set(h, []);
+	for (const c of checkouts) {
+		const hour = new Date(c.timestamp).getHours();
+		if (buckets.has(hour)) buckets.get(hour)?.push(c);
+	}
+
+	return Array.from({ length: count }, (_, i) => {
+		const h = start + i;
+		return {
+			id: String(h).padStart(2, "0"),
+			label: `${String(h).padStart(2, "0")}:00`,
+			cash: sumByMethod(buckets.get(h) ?? [], "cash"),
+			card: sumByMethod(buckets.get(h) ?? [], "card"),
+			transfer: sumByMethod(buckets.get(h) ?? [], "transfer"),
+		};
 	});
-	const daysSince = Number(day.since(firstJan).total({ unit: "days" }));
-	const weekNum = Math.ceil((daysSince + firstJan.dayOfWeek + 1) / 7);
-	return `${day.year}-W${String(Math.floor(weekNum)).padStart(2, "0")}`;
+}
+
+function buildWeekdayData(
+	days: Temporal.PlainDate[],
+	grouped: Record<string, Checkout[]>,
+): ChartDataPoint[] {
+	return days.map((day) => {
+		const key = toISOString(day);
+		const dayCheckouts = grouped[key] ?? [];
+		return {
+			id: key,
+			label: DAY_NAMES[day.dayOfWeek % 7],
+			cash: sumByMethod(dayCheckouts, "cash"),
+			card: sumByMethod(dayCheckouts, "card"),
+			transfer: sumByMethod(dayCheckouts, "transfer"),
+		};
+	});
+}
+
+function buildMonthdayData(
+	days: Temporal.PlainDate[],
+	grouped: Record<string, Checkout[]>,
+): ChartDataPoint[] {
+	return days.map((day) => {
+		const key = toISOString(day);
+		const dayCheckouts = grouped[key] ?? [];
+		return {
+			id: key,
+			label: String(day.day),
+			cash: sumByMethod(dayCheckouts, "cash"),
+			card: sumByMethod(dayCheckouts, "card"),
+			transfer: sumByMethod(dayCheckouts, "transfer"),
+		};
+	});
+}
+
+function monthKey(day: Temporal.PlainDate): string {
+	return `${day.year}-${String(day.month).padStart(2, "0")}`;
+}
+
+function buildMonthlyData(
+	days: Temporal.PlainDate[],
+	grouped: Record<string, Checkout[]>,
+	singleYear: boolean,
+): ChartDataPoint[] {
+	const bucketKeys: string[] = [];
+	const seen = new Set<string>();
+	for (const day of days) {
+		const mk = monthKey(day);
+		if (!seen.has(mk)) {
+			seen.add(mk);
+			bucketKeys.push(mk);
+		}
+	}
+
+	const buckets = new Map<string, Checkout[]>();
+	for (const bk of bucketKeys) buckets.set(bk, []);
+	for (const [dayKey, dayCheckouts] of Object.entries(grouped)) {
+		if (dayCheckouts.length === 0) continue;
+		const cd = Temporal.PlainDate.from(dayKey);
+		const mk = monthKey(cd);
+		buckets.get(mk)?.push(...dayCheckouts);
+	}
+
+	return bucketKeys.map((bk) => {
+		const [, mm] = bk.split("-");
+		const monthIdx = Number(mm) - 1;
+		const label = singleYear
+			? MONTH_NAMES[monthIdx]
+			: `${MONTH_NAMES[monthIdx]} '${bk.slice(2, 4)}`;
+		return {
+			id: bk,
+			label,
+			cash: sumByMethod(buckets.get(bk) ?? [], "cash"),
+			card: sumByMethod(buckets.get(bk) ?? [], "card"),
+			transfer: sumByMethod(buckets.get(bk) ?? [], "transfer"),
+		};
+	});
+}
+
+function yearKey(day: Temporal.PlainDate): string {
+	return String(day.year);
+}
+
+function buildYearlyData(
+	days: Temporal.PlainDate[],
+	grouped: Record<string, Checkout[]>,
+): ChartDataPoint[] {
+	const bucketKeys: string[] = [];
+	const seen = new Set<string>();
+	for (const day of days) {
+		const yk = yearKey(day);
+		if (!seen.has(yk)) {
+			seen.add(yk);
+			bucketKeys.push(yk);
+		}
+	}
+
+	const buckets = new Map<string, Checkout[]>();
+	for (const bk of bucketKeys) buckets.set(bk, []);
+	for (const [dayKey, dayCheckouts] of Object.entries(grouped)) {
+		if (dayCheckouts.length === 0) continue;
+		const cd = Temporal.PlainDate.from(dayKey);
+		const yk = yearKey(cd);
+		buckets.get(yk)?.push(...dayCheckouts);
+	}
+
+	return bucketKeys.map((bk) => ({
+		id: bk,
+		label: bk,
+		cash: sumByMethod(buckets.get(bk) ?? [], "cash"),
+		card: sumByMethod(buckets.get(bk) ?? [], "card"),
+		transfer: sumByMethod(buckets.get(bk) ?? [], "transfer"),
+	}));
 }
 
 function AmountTooltip({
@@ -160,12 +262,50 @@ function LegendContent() {
 	);
 }
 
-export function BarChart({ checkouts, range }: BarChartProps) {
+const titleLabels: Record<DatePreset, string> = {
+	today: "Hourly",
+	week: "Daily",
+	month: "Daily",
+	year: "Monthly",
+	all: "Yearly",
+};
+
+export function BarChart({ checkouts, range, preset }: BarChartProps) {
 	const days = eachDayInRange(range.from, range.to);
 	const dayCount = days.length;
 	const grouped = groupByDay(checkouts);
 
-	const chartData = buildChartData(days, grouped, dayCount);
+	let chartData: ChartDataPoint[];
+	let chartTitle: string;
+
+	switch (preset) {
+		case "today":
+			chartData = buildHourlyData(checkouts);
+			chartTitle = "Hourly";
+			break;
+		case "week":
+			chartData = buildWeekdayData(days, grouped);
+			chartTitle = "Daily";
+			break;
+		case "month":
+			chartData = buildMonthdayData(days, grouped);
+			chartTitle = "Daily";
+			break;
+		case "year":
+			chartData = buildMonthlyData(days, grouped, true);
+			chartTitle = "Monthly";
+			break;
+		case "all": {
+			if (dayCount < 730) {
+				chartData = buildMonthlyData(days, grouped, dayCount > 365);
+				chartTitle = "Monthly";
+			} else {
+				chartData = buildYearlyData(days, grouped);
+				chartTitle = "Yearly";
+			}
+			break;
+		}
+	}
 
 	if (checkouts.length === 0) {
 		return (
@@ -187,7 +327,7 @@ export function BarChart({ checkouts, range }: BarChartProps) {
 		<Card className="p-6">
 			<div className="flex justify-between items-center mb-6">
 				<h2 className="font-semibold text-slate-900 text-base">
-					{dayCount > 31 ? "Weekly Activity" : "Daily Activity"}
+					{chartTitle} Activity
 					<span className="ml-2 font-normal text-slate-400 text-sm">
 						{checkouts.length} checkouts
 					</span>
@@ -210,8 +350,8 @@ export function BarChart({ checkouts, range }: BarChartProps) {
 					tick={{ fill: "#94a3b8", fontSize: 10 }}
 					tickLine={false}
 					axisLine={{ stroke: "#e2e8f0" }}
-					niceTicks="snap125"
-					interval={Math.max(1, Math.floor(chartData.length / 20))}
+					minTickGap={20}
+					interval="preserveStartEnd"
 				/>
 				<YAxis
 					tickFormatter={(value: number) => `₾ ${(value / 100).toFixed(0)}`}

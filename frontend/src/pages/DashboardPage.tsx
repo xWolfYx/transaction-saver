@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BarChart } from "../components/BarChart";
 import { DateRangePicker } from "../components/DateRangePicker";
 import { ExportButton } from "../components/ExportButton";
@@ -6,7 +6,7 @@ import { PageLayout } from "../components/layout/PageLayout";
 import { Stats } from "../components/Stats";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
-import { filterByDateRange, getDateRange } from "../lib/utils";
+import { filterByDateRange, getDateRange, type DatePreset } from "../lib/utils";
 import { useCheckoutStore } from "../store/checkout.store";
 
 export function DashboardPage() {
@@ -15,11 +15,35 @@ export function DashboardPage() {
 	const error = useCheckoutStore((s) => s.error);
 	const fetchCheckouts = useCheckoutStore((s) => s.fetchCheckouts);
 
+	const currentPreset = useRef<DatePreset>("today");
 	const [range, setRange] = useState(() => getDateRange("today"));
 
 	useEffect(() => {
 		fetchCheckouts().then(() => setReady(true));
 	}, [fetchCheckouts]);
+
+	// Recompute "all" range when checkouts finish loading
+	useEffect(() => {
+		if (ready && currentPreset.current === "all") {
+			setRange(getDateRange("all", checkouts));
+		}
+	}, [ready, checkouts]);
+
+	const handleRangeChange = (
+		newRange: { from: Temporal.PlainDate; to: Temporal.PlainDate },
+		preset?: DatePreset,
+	) => {
+		if (preset) {
+			// Prevent re-render when same preset is clicked (avoids animation freezes)
+			if (preset === currentPreset.current) return;
+			currentPreset.current = preset;
+			if (preset === "all" && checkouts.length > 0) {
+				setRange(getDateRange("all", checkouts));
+				return;
+			}
+		}
+		setRange(newRange);
+	};
 
 	const filtered = filterByDateRange(checkouts, range.from, range.to);
 
@@ -141,7 +165,7 @@ export function DashboardPage() {
 	return (
 		<PageLayout>
 			<div className="space-y-6">
-				<DateRangePicker onChange={setRange} />
+				<DateRangePicker onChange={handleRangeChange} />
 				<Stats checkouts={filtered} />
 				<div className="flex justify-end">
 					<ExportButton
@@ -149,7 +173,7 @@ export function DashboardPage() {
 						filename={`checkouts-${range.from.toString()}-to-${range.to.toString()}.csv`}
 					/>
 				</div>
-				<BarChart checkouts={filtered} range={range} />
+				<BarChart checkouts={filtered} range={range} preset={currentPreset.current} />
 			</div>
 		</PageLayout>
 	);

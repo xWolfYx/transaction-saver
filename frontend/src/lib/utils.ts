@@ -44,7 +44,12 @@ export function parsePlainDate(dateString: string): Temporal.PlainDate {
 
 // --- Date range helpers ---
 
-export function getDateRange(preset: "today" | "week" | "month"): {
+export type DatePreset = "today" | "week" | "month" | "year" | "all";
+
+export function getDateRange(
+	preset: DatePreset,
+	checkouts?: Checkout[],
+): {
 	from: Temporal.PlainDate;
 	to: Temporal.PlainDate;
 } {
@@ -66,6 +71,28 @@ export function getDateRange(preset: "today" | "week" | "month"): {
 			const firstOfMonth = t.with({ day: 1 });
 			const firstOfNextMonth = firstOfMonth.add({ months: 1 });
 			return { from: firstOfMonth, to: firstOfNextMonth };
+		}
+
+		case "year": {
+			const firstOfYear = t.with({ month: 1, day: 1 });
+			const firstOfNextYear = firstOfYear.add({ years: 1 });
+			return { from: firstOfYear, to: firstOfNextYear };
+		}
+
+		case "all": {
+			if (checkouts && checkouts.length > 0) {
+				const dates = checkouts.map((c) =>
+					Temporal.PlainDate.from(dateKey(c.timestamp)),
+				);
+				const min = dates.reduce((a, b) =>
+					Temporal.PlainDate.compare(a, b) < 0 ? a : b,
+				);
+				const max = dates.reduce((a, b) =>
+					Temporal.PlainDate.compare(a, b) > 0 ? a : b,
+				);
+				return { from: min, to: max.add({ days: 1 }) };
+			}
+			return { from: t, to: t.add({ days: 1 }) };
 		}
 	}
 }

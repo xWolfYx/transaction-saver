@@ -2,21 +2,27 @@ import { useState } from "react";
 import { Card } from "./ui/Card";
 import { Input } from "./ui/Input";
 import { getDateRange, toISOString, today } from "../lib/utils";
+import type { DatePreset } from "../lib/utils";
 import { Temporal } from "temporal-polyfill";
 
-type Preset = "today" | "week" | "month";
+type Preset = "today" | "week" | "month" | "year" | "all";
 
 interface DateRangePickerProps {
-	onChange: (range: {
-		from: Temporal.PlainDate;
-		to: Temporal.PlainDate;
-	}) => void;
+	onChange: (
+		range: {
+			from: Temporal.PlainDate;
+			to: Temporal.PlainDate;
+		},
+		preset?: DatePreset,
+	) => void;
 }
 
 const presets: { key: Preset; label: string }[] = [
 	{ key: "today", label: "Today" },
 	{ key: "week", label: "This Week" },
 	{ key: "month", label: "This Month" },
+	{ key: "year", label: "This Year" },
+	{ key: "all", label: "All" },
 ];
 
 export function DateRangePicker({ onChange }: DateRangePickerProps) {
@@ -29,7 +35,7 @@ export function DateRangePicker({ onChange }: DateRangePickerProps) {
 		const range = getDateRange(preset);
 		setFromDate(toISOString(range.from));
 		setToDate(toISOString(range.to));
-		onChange(range);
+		onChange(range, preset);
 	};
 
 	const handleCustomChange = (field: "from" | "to", value: string) => {
