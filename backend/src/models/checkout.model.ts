@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { type Checkout } from "@transaction-saver/shared";
+import { type Checkout } from "@tally/shared";
 
 const DATA_FILE = path.join(import.meta.dirname, "../../data/checkouts.json");
 

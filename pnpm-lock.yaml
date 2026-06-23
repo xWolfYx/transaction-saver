@@ -14,7 +14,7 @@ importers:
 
   backend:
     dependencies:
-      '@transaction-saver/shared':
+      '@tally/shared':
         specifier: workspace:*
         version: link:../shared
       '@types/cors':
@@ -45,7 +45,7 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.1
         version: 4.3.1(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4))
-      '@transaction-saver/shared':
+      '@tally/shared':
         specifier: workspace:*
         version: link:../shared
       react:

@@ -3,7 +3,7 @@ import {
 	GEL_DIVISOR,
 	PAYMENT_METHOD,
 	type PaymentMethod,
-} from "@transaction-saver/shared";
+} from "@tally/shared";
 import { useState } from "react";
 import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";

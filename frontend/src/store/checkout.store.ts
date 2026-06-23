@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 import { create } from "zustand";
 import * as api from "../lib/api";
 

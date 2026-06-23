@@ -14,7 +14,7 @@ export function Navigation() {
 						₾
 					</div>
 					<span className="font-semibold text-slate-900 text-lg tracking-tight">
-						Checkout Logger
+						Tally
 					</span>
 				</div>
 				<nav className="flex items-center bg-slate-100 p-1 rounded-lg">

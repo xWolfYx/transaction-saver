@@ -1,4 +1,4 @@
-import type { PaymentMethod } from "@transaction-saver/shared";
+import type { PaymentMethod } from "@tally/shared";
 
 const styles: Record<
 	PaymentMethod,

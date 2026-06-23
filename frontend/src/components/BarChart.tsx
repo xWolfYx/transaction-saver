@@ -14,7 +14,7 @@ import {
 	groupByDay,
 	toISOString,
 } from "../lib/utils";
-import type { Checkout, PaymentMethod } from "@transaction-saver/shared";
+import type { Checkout, PaymentMethod } from "@tally/shared";
 import { Card } from "./ui/Card";
 
 interface BarChartProps {

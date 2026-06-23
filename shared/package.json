@@ -1,5 +1,5 @@
 {
-  "name": "@transaction-saver/shared",
+  "name": "@tally/shared",
   "version": "1.0.0",
   "private": true,
   "type": "module",

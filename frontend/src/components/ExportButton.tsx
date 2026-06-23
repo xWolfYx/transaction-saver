@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 import { downloadCSV } from "../lib/utils";
 import { Button } from "./ui/Button";
 

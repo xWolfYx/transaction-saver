@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 import { formatGEL } from "../lib/utils";
 import { StatCard } from "./ui/StatCard";
 

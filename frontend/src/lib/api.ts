@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 const API_PATH = `${API_BASE}/api/checkouts`;

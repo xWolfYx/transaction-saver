@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 import { useEffect, useState } from "react";
 import { CheckoutForm } from "../components/CheckoutForm";
 import { CheckoutHistory } from "../components/CheckoutHistory";
@@ -8,6 +8,7 @@ import { Stats } from "../components/Stats";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { showToast } from "../lib/toast";
+import { showUndoToast } from "../lib/undo-toast";
 import { useCheckoutStore } from "../store/checkout.store";
 
 export function LogPage() {
@@ -33,19 +34,39 @@ export function LogPage() {
 	};
 
 	const handleDelete = async (id: string) => {
+		const deletedCheckout = checkouts.find((c) => c.id === id);
+		if (!deletedCheckout) return;
 		try {
 			await deleteCheckout(id);
-			showToast.info("Checkout deleted");
+			showUndoToast("Checkout deleted", async () => {
+				try {
+					const { id: _id, ...data } = deletedCheckout;
+					await addCheckout(data);
+					showToast.success("Checkout restored");
+				} catch {
+					showToast.error("Failed to restore checkout");
+				}
+			});
 		} catch {
 			showToast.error("Failed to delete checkout");
 		}
 	};
 
 	const handleEdit = async (updated: Checkout) => {
+		const oldCheckout = checkouts.find((c) => c.id === updated.id);
+		if (!oldCheckout) return;
 		try {
 			const { id, ...rest } = updated;
 			await updateCheckout(id, rest);
-			showToast.success("Checkout updated");
+			showUndoToast("Checkout updated", async () => {
+				try {
+					const { id: oldId, ...oldRest } = oldCheckout;
+					await updateCheckout(oldId, oldRest);
+					showToast.success("Edit undone");
+				} catch {
+					showToast.error("Failed to undo edit");
+				}
+			});
 		} catch {
 			showToast.error("Failed to update checkout");
 		}
@@ -78,8 +99,8 @@ export function LogPage() {
 						<div className="mb-5 h-5 w-32 bg-slate-200 rounded animate-pulse" />
 						<div className="space-y-4">
 							<div className="flex gap-3">
-								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */}
-								{[...Array(3)].map((_, i) => (
+								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
+								[...Array(3)].map((_, i) => (
 									<div
 										key={`form-pill-${i}`}
 										className="h-12 flex-1 bg-slate-200 rounded-xl animate-pulse"
@@ -93,8 +114,8 @@ export function LogPage() {
 					</Card>
 
 					<div className="gap-4 grid grid-cols-2 lg:grid-cols-4">
-						{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */}
-						{[...Array(4)].map((_, i) => (
+						{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
+						[...Array(4)].map((_, i) => (
 							<div
 								key={`stat-${i}`}
 								className="h-24 bg-slate-200 rounded-xl animate-pulse"
@@ -108,8 +129,8 @@ export function LogPage() {
 						</div>
 						<div className="overflow-x-auto">
 							<div className="divide-y divide-slate-50">
-								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */}
-								{[...Array(10)].map((_, i) => (
+								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
+								[...Array(10)].map((_, i) => (
 									<div
 										key={`row-${i}`}
 										className="flex items-center gap-4 px-6 py-3.5"

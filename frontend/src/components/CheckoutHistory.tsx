@@ -1,4 +1,4 @@
-import type { Checkout } from "@transaction-saver/shared";
+import type { Checkout } from "@tally/shared";
 import { useState } from "react";
 import { formatDate, formatGEL } from "../lib/utils";
 import { EditModal } from "./EditModal";

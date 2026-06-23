@@ -1,4 +1,4 @@
-import { type Checkout, GEL_DIVISOR } from "@transaction-saver/shared";
+import { type Checkout, GEL_DIVISOR } from "@tally/shared";
 import { Temporal } from "temporal-polyfill";
 
 // --- Formatting ---
