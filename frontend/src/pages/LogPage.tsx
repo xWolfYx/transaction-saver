@@ -1,7 +1,9 @@
 import type { Checkout } from "@tally/shared";
 import { useEffect, useState } from "react";
+import { BarChart } from "../components/BarChart";
 import { CheckoutForm } from "../components/CheckoutForm";
 import { CheckoutHistory } from "../components/CheckoutHistory";
+import { TodayPieChart } from "../components/TodayPieChart";
 import { PageLayout } from "../components/layout/PageLayout";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -119,6 +121,19 @@ export function LogPage() {
 						</div>
 					</Card>
 
+					<div className="flex flex-col lg:flex-row gap-6">
+						<div className="w-full lg:w-2/3">
+							<Card className="p-6">
+								<div className="bg-slate-200 rounded-xl h-[280px] animate-pulse" />
+							</Card>
+						</div>
+						<div className="w-full lg:w-1/3">
+							<Card className="p-6">
+								<div className="bg-slate-200 rounded-xl h-[280px] animate-pulse" />
+							</Card>
+						</div>
+					</div>
+
 					<Card className="p-0 overflow-hidden">
 						<div className="px-6 pt-5 pb-3">
 							<div className="h-5 w-24 bg-slate-200 rounded animate-pulse" />
@@ -149,6 +164,20 @@ export function LogPage() {
 		<PageLayout>
 			<div className="space-y-6">
 				<CheckoutForm onSubmit={handleSubmit} />
+
+				<div className="flex flex-col lg:flex-row gap-6">
+					<div className="w-full lg:w-2/3">
+						<BarChart
+							checkouts={todayTransactions}
+							range={{ from: todayRange, to: todayRange.add({ days: 1 }) }}
+							preset="today"
+						/>
+					</div>
+					<div className="w-full lg:w-1/3">
+						<TodayPieChart checkouts={todayTransactions} />
+					</div>
+				</div>
+
 				<CheckoutHistory
 					checkouts={todayTransactions}
 					onDelete={handleDelete}
