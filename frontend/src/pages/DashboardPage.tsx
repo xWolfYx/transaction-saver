@@ -260,12 +260,6 @@ export function DashboardPage() {
 						<div className="flex-1">
 							<DateRangePicker onChange={handleRangeChange} />
 						</div>
-						<div className="shrink-0">
-							<ExportButton
-								checkouts={filteredByDate}
-								filename={`checkouts-${range.from.toString()}-to-${range.to.toString()}.csv`}
-							/>
-						</div>
 					</div>
 					<BarChart checkouts={filteredByDate} range={range} preset={currentPreset.current} />
 				</div>
@@ -350,6 +344,7 @@ export function DashboardPage() {
 					checkouts={paginated}
 					onDelete={handleDelete}
 					onEdit={handleEdit}
+						headerAction={<ExportButton checkouts={processed} filename={"checkouts-export.csv"} />}
 				/>
 
 				{/* Pagination */}

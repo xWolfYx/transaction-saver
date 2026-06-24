@@ -10,12 +10,14 @@ interface CheckoutHistoryProps {
 	checkouts: Checkout[];
 	onDelete: (id: string) => void;
 	onEdit: (checkout: Checkout) => void;
+	headerAction?: React.ReactNode;
 }
 
 export function CheckoutHistory({
 	checkouts,
 	onDelete,
 	onEdit,
+	headerAction,
 }: CheckoutHistoryProps) {
 	const [editing, setEditing] = useState<Checkout | null>(null);
 
@@ -38,13 +40,14 @@ export function CheckoutHistory({
 	return (
 		<>
 			<Card className="p-0 overflow-hidden">
-				<div className="px-6 pt-5 pb-3">
+				<div className="flex items-center justify-between px-6 pt-5 pb-3">
 					<h2 className="font-semibold text-slate-900 text-base">
 						History
 						<span className="ml-2 font-normal text-slate-400 text-sm">
 							{checkouts.length} {checkouts.length === 1 ? "entry" : "entries"}
 						</span>
 					</h2>
+					{headerAction && <div className="shrink-0">{headerAction}</div>}
 				</div>
 				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
