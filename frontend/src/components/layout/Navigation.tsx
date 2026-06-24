@@ -79,16 +79,14 @@ export function Navigation() {
 				}`}
 			>
 				{/* Logo */}
-				<div className="flex items-center h-16 px-3 border-b border-slate-200/80">
+				<div className="flex items-center px-3 border-slate-200/80 border-b h-16">
 					<div className="flex items-center gap-3 min-w-0">
-						<div className="flex-shrink-0 flex justify-center items-center bg-brand-600 rounded-lg w-8 h-8 font-bold text-white text-sm">
+						<div className="flex justify-center items-center bg-brand-600 rounded-lg size-10 font-bold text-white text-sm shrink-0">
 							₾
 						</div>
 						<span
 							className={`font-semibold text-slate-900 text-lg tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300 ${
-								collapsed
-									? "max-w-0 opacity-0"
-									: "max-w-40 opacity-100"
+								collapsed ? "max-w-0 opacity-0" : "max-w-40 opacity-100"
 							}`}
 						>
 							Tally
@@ -101,10 +99,10 @@ export function Navigation() {
 					<button
 						type="button"
 						onClick={() => setModalOpen(true)}
-						className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 transition-all duration-150"
+						className="flex items-center gap-3 bg-brand-600 hover:bg-brand-700 px-3 py-2.5 rounded-lg w-full font-medium text-white text-sm transition-all duration-150 cursor-pointer"
 						title="New Checkout"
 					>
-						<span className="flex-shrink-0 flex justify-center items-center w-5 h-5">
+						<span className="flex justify-center items-center size-4 shrink-0">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
@@ -122,9 +120,7 @@ export function Navigation() {
 						</span>
 						<span
 							className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
-								collapsed
-									? "max-w-0 opacity-0"
-									: "max-w-40 opacity-100"
+								collapsed ? "max-w-0 opacity-0" : "max-w-40 opacity-100"
 							}`}
 						>
 							New Checkout
@@ -133,7 +129,7 @@ export function Navigation() {
 				</div>
 
 				{/* Nav Links */}
-				<nav className="flex flex-col gap-1 p-3 flex-1">
+				<nav className="flex flex-col flex-1 gap-1 p-3">
 					{links.map(({ to, label, end, icon }) => (
 						<NavLink
 							key={to}
@@ -147,14 +143,12 @@ export function Navigation() {
 								}`
 							}
 						>
-							<span className="flex-shrink-0 flex justify-center items-center w-5 h-5">
+							<span className="flex justify-center items-center size-4 shrink-0">
 								{icon}
 							</span>
 							<span
 								className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
-									collapsed
-										? "max-w-0 opacity-0"
-										: "max-w-40 opacity-100"
+									collapsed ? "max-w-0 opacity-0" : "max-w-40 opacity-100"
 								}`}
 							>
 								{label}
@@ -164,14 +158,14 @@ export function Navigation() {
 				</nav>
 
 				{/* Collapse Toggle */}
-				<div className="p-3 border-t border-slate-200/80">
+				<div className="p-3 border-slate-200/80 border-t">
 					<button
 						type="button"
 						onClick={() => setCollapsed((prev) => !prev)}
-						className="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all duration-150"
+						className="flex items-center gap-3 hover:bg-slate-100 px-3 py-2 rounded-lg w-full text-slate-400 hover:text-slate-600 text-sm transition-all duration-150"
 						title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
 					>
-						<span className="flex-shrink-0 flex justify-center items-center w-5 h-5">
+						<span className="flex justify-center items-center w-5 h-5 shrink-0">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
@@ -191,9 +185,7 @@ export function Navigation() {
 						</span>
 						<span
 							className={`overflow-hidden whitespace-nowrap text-xs transition-all duration-300 ${
-								collapsed
-									? "max-w-0 opacity-0"
-									: "max-w-40 opacity-100"
+								collapsed ? "max-w-0 opacity-0" : "max-w-40 opacity-100"
 							}`}
 						>
 							Collapse
@@ -205,11 +197,11 @@ export function Navigation() {
 			{/* New Checkout Modal */}
 			{modalOpen && (
 				<div
-					className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 backdrop-blur-sm"
+					className="z-50 fixed inset-0 flex justify-center items-center bg-black/40 backdrop-blur-sm"
 					onClick={() => setModalOpen(false)}
 				>
 					<div
-						className="w-full mx-4 max-w-md"
+						className="mx-4 w-full max-w-md"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<CheckoutForm onSubmit={handleSubmit} />

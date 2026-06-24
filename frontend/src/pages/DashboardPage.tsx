@@ -157,7 +157,7 @@ export function DashboardPage() {
 	if (!ready) {
 		return (
 			<PageLayout>
-				<div className="space-y-6">
+				<div className="space-y-4">
 					<div className="bg-slate-200 rounded-xl h-20 animate-pulse" />
 
 					<div className="gap-4 grid grid-cols-2 lg:grid-cols-4">
@@ -252,16 +252,23 @@ export function DashboardPage() {
 
 	return (
 		<PageLayout>
-			<div className="space-y-6">
-				<DateRangePicker onChange={handleRangeChange} />
+			<div className="space-y-4">
 				<Stats checkouts={filteredByDate} />
-				<div className="flex justify-end">
-					<ExportButton
-						checkouts={filteredByDate}
-						filename={`checkouts-${range.from.toString()}-to-${range.to.toString()}.csv`}
-					/>
+
+				<div className="bg-white border border-slate-200/80 rounded-xl">
+					<div className="flex sm:flex-row flex-col sm:items-center gap-3 px-4 pt-4 pb-2 border-b border-slate-100">
+						<div className="flex-1">
+							<DateRangePicker onChange={handleRangeChange} />
+						</div>
+						<div className="shrink-0">
+							<ExportButton
+								checkouts={filteredByDate}
+								filename={`checkouts-${range.from.toString()}-to-${range.to.toString()}.csv`}
+							/>
+						</div>
+					</div>
+					<BarChart checkouts={filteredByDate} range={range} preset={currentPreset.current} />
 				</div>
-				<BarChart checkouts={filteredByDate} range={range} preset={currentPreset.current} />
 
 				{/* Filters & Table */}
 				<div className="flex sm:flex-row flex-col sm:items-center gap-3">
