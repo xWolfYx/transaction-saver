@@ -35,6 +35,7 @@ export function DashboardPage() {
 	const deleteCheckout = useCheckoutStore((s) => s.deleteCheckout);
 
 	const currentPreset = useRef<DatePreset>("today");
+	const isCustomRange = useRef(false);
 	const [range, setRange] = useState(() => getDateRange("today"));
 
 	// Table state
@@ -59,13 +60,17 @@ export function DashboardPage() {
 		preset?: DatePreset,
 	) => {
 		if (preset) {
-			// Prevent re-render when same preset is clicked (avoids animation freezes)
-			if (preset === currentPreset.current) return;
+			// Re-apply preset only if it's a different one or we switched to custom range
+			if (preset === currentPreset.current && !isCustomRange.current) return;
+			isCustomRange.current = false;
 			currentPreset.current = preset;
 			if (preset === "all" && checkouts.length > 0) {
 				setRange(getDateRange("all", checkouts));
 				return;
 			}
+		} else {
+			// Custom range from calendar — allow same preset button to be clicked again
+			isCustomRange.current = true;
 		}
 		setRange(newRange);
 	};
@@ -256,7 +261,7 @@ export function DashboardPage() {
 				<Stats checkouts={filteredByDate} />
 
 				<div className="bg-white border border-slate-200/80 rounded-xl">
-					<div className="flex sm:flex-row flex-col sm:items-center gap-3 px-4 pt-4 pb-2 border-b border-slate-100">
+					<div className="flex sm:flex-row flex-col sm:items-center gap-3 px-4 pt-4 pb-2 border-slate-100 border-b">
 						<div className="flex-1">
 							<DateRangePicker onChange={handleRangeChange} />
 						</div>
@@ -272,7 +277,7 @@ export function DashboardPage() {
 							setMethodFilter(e.target.value as PaymentMethod | "");
 							setPage(1);
 						}}
-						className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none"
+						className="bg-white shadow-sm px-3 py-2 border border-slate-200 focus:border-brand-500 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500 text-slate-700 text-sm"
 					>
 						{methodOptions.map((opt) => (
 							<option key={opt.value} value={opt.value}>
@@ -320,7 +325,7 @@ export function DashboardPage() {
 								: "Lowest first"}
 					</button>
 
-					<div className="sm:ml-auto flex items-center gap-2 text-sm text-slate-500">
+					<div className="flex items-center gap-2 sm:ml-auto text-slate-500 text-sm">
 						<span>Show</span>
 						<select
 							value={pageSize}
@@ -328,7 +333,7 @@ export function DashboardPage() {
 								setPageSize(Number(e.target.value));
 								setPage(1);
 							}}
-							className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none"
+							className="bg-white px-2 py-1.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500 text-slate-700 text-sm"
 						>
 							{PAGE_SIZES.map((size) => (
 								<option key={size} value={size}>
@@ -358,7 +363,7 @@ export function DashboardPage() {
 						>
 							Previous
 						</Button>
-						<span className="px-3 text-sm text-slate-500 tabular-nums">
+						<span className="px-3 tabular-nums text-slate-500 text-sm">
 							Page {safePage} of {totalPages}
 						</span>
 						<Button
