@@ -92,22 +92,22 @@ export function LogPage() {
 	if (!ready) {
 		return (
 			<PageLayout>
-				<div className="space-y-6">
-					<div className="flex flex-col lg:flex-row gap-6">
+				<div className="space-y-4">
+					<div className="flex flex-col lg:flex-row gap-4">
 						<div className="w-full lg:w-2/3">
-							<Card className="p-6">
+							<Card className="p-4">
 								<div className="bg-slate-200 rounded-xl h-[360px] animate-pulse" />
 							</Card>
 						</div>
 						<div className="w-full lg:w-1/3">
-							<Card className="p-6">
+							<Card className="p-4">
 								<div className="bg-slate-200 rounded-xl h-[360px] animate-pulse" />
 							</Card>
 						</div>
 					</div>
 
 					<Card className="p-0 overflow-hidden">
-						<div className="px-6 pt-5 pb-3">
+						<div className="px-4 pt-4 pb-2">
 							<div className="h-5 w-24 bg-slate-200 rounded animate-pulse" />
 						</div>
 						<div className="overflow-x-auto">
@@ -116,7 +116,7 @@ export function LogPage() {
 								[...Array(5)].map((_, i) => (
 									<div
 										key={`row-${i}`}
-										className="flex items-center gap-4 px-6 py-3.5"
+										className="flex items-center gap-4 px-4 py-3"
 									>
 										<div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
 										<div className="h-5 w-16 bg-slate-200 rounded-full animate-pulse" />
@@ -134,8 +134,8 @@ export function LogPage() {
 
 	return (
 		<PageLayout>
-			<div className="space-y-6">
-				<div className="flex flex-col lg:flex-row gap-6">
+			<div className="space-y-4">
+				<div className="flex flex-col lg:flex-row gap-4">
 					<div className="w-full lg:w-2/3">
 						<BarChart
 							checkouts={todayTransactions}

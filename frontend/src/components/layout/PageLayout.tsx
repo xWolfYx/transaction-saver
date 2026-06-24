@@ -6,6 +6,6 @@ interface PageLayoutProps {
 
 export function PageLayout({ children }: PageLayoutProps) {
 	return (
-		<main className="mx-auto px-4 sm:px-6 py-8 max-w-6xl">{children}</main>
+		<main className="px-2 sm:px-4 py-4">{children}</main>
 	);
 }
