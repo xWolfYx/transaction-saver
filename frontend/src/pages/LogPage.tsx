@@ -2,13 +2,12 @@ import type { Checkout } from "@tally/shared";
 import { useEffect, useState } from "react";
 import { CheckoutForm } from "../components/CheckoutForm";
 import { CheckoutHistory } from "../components/CheckoutHistory";
-import { ExportButton } from "../components/ExportButton";
 import { PageLayout } from "../components/layout/PageLayout";
-import { Stats } from "../components/Stats";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { showToast } from "../lib/toast";
 import { showUndoToast } from "../lib/undo-toast";
+import { filterByDateRange, today } from "../lib/utils";
 import { useCheckoutStore } from "../store/checkout.store";
 
 export function LogPage() {
@@ -72,6 +71,13 @@ export function LogPage() {
 		}
 	};
 
+	const todayRange = today();
+	const todayTransactions = filterByDateRange(
+		checkouts,
+		todayRange,
+		todayRange.add({ days: 1 }),
+	);
+
 	if (error && !ready) {
 		return (
 			<PageLayout>
@@ -113,16 +119,6 @@ export function LogPage() {
 						</div>
 					</Card>
 
-					<div className="gap-4 grid grid-cols-2 lg:grid-cols-4">
-						{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
-						[...Array(4)].map((_, i) => (
-							<div
-								key={`stat-${i}`}
-								className="h-24 bg-slate-200 rounded-xl animate-pulse"
-							/>
-						))}
-					</div>
-
 					<Card className="p-0 overflow-hidden">
 						<div className="px-6 pt-5 pb-3">
 							<div className="h-5 w-24 bg-slate-200 rounded animate-pulse" />
@@ -130,7 +126,7 @@ export function LogPage() {
 						<div className="overflow-x-auto">
 							<div className="divide-y divide-slate-50">
 								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
-								[...Array(10)].map((_, i) => (
+								[...Array(5)].map((_, i) => (
 									<div
 										key={`row-${i}`}
 										className="flex items-center gap-4 px-6 py-3.5"
@@ -153,12 +149,8 @@ export function LogPage() {
 		<PageLayout>
 			<div className="space-y-6">
 				<CheckoutForm onSubmit={handleSubmit} />
-				<Stats checkouts={checkouts} />
-				<div className="flex justify-end">
-					<ExportButton checkouts={checkouts} />
-				</div>
 				<CheckoutHistory
-					checkouts={checkouts}
+					checkouts={todayTransactions}
 					onDelete={handleDelete}
 					onEdit={handleEdit}
 				/>

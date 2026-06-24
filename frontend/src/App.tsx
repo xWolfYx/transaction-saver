@@ -6,12 +6,14 @@ import { LogPage } from "./pages/LogPage";
 
 function App() {
 	return (
-		<div className="bg-gray-50 min-h-screen">
+		<div className="bg-gray-50 min-h-screen flex">
 			<Navigation />
-			<Routes>
-				<Route path="/" element={<LogPage />} />
-				<Route path="/dashboard" element={<DashboardPage />} />
-			</Routes>
+			<div className="flex-1 min-w-0">
+				<Routes>
+					<Route path="/" element={<LogPage />} />
+					<Route path="/dashboard" element={<DashboardPage />} />
+				</Routes>
+			</div>
 			<Toaster />
 		</div>
 	);
