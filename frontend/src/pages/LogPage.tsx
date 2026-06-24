@@ -1,7 +1,6 @@
 import type { Checkout } from "@tally/shared";
 import { useEffect, useState } from "react";
 import { BarChart } from "../components/BarChart";
-import { CheckoutForm } from "../components/CheckoutForm";
 import { CheckoutHistory } from "../components/CheckoutHistory";
 import { TodayPieChart } from "../components/TodayPieChart";
 import { PageLayout } from "../components/layout/PageLayout";
@@ -24,15 +23,6 @@ export function LogPage() {
 	useEffect(() => {
 		fetchCheckouts().then(() => setReady(true));
 	}, [fetchCheckouts]);
-
-	const handleSubmit = async (data: Omit<Checkout, "id">) => {
-		try {
-			await addCheckout(data);
-			showToast.success("Checkout logged");
-		} catch {
-			showToast.error("Failed to log checkout");
-		}
-	};
 
 	const handleDelete = async (id: string) => {
 		const deletedCheckout = checkouts.find((c) => c.id === id);
@@ -103,33 +93,15 @@ export function LogPage() {
 		return (
 			<PageLayout>
 				<div className="space-y-6">
-					<Card className="p-6">
-						<div className="mb-5 h-5 w-32 bg-slate-200 rounded animate-pulse" />
-						<div className="space-y-4">
-							<div className="flex gap-3">
-								{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */
-								[...Array(3)].map((_, i) => (
-									<div
-										key={`form-pill-${i}`}
-										className="h-12 flex-1 bg-slate-200 rounded-xl animate-pulse"
-									/>
-								))}
-							</div>
-							<div className="h-12 bg-slate-200 rounded-xl animate-pulse" />
-							<div className="h-12 bg-slate-200 rounded-xl animate-pulse" />
-							<div className="h-12 bg-slate-200 rounded-xl animate-pulse" />
-						</div>
-					</Card>
-
 					<div className="flex flex-col lg:flex-row gap-6">
 						<div className="w-full lg:w-2/3">
 							<Card className="p-6">
-								<div className="bg-slate-200 rounded-xl h-[280px] animate-pulse" />
+								<div className="bg-slate-200 rounded-xl h-[360px] animate-pulse" />
 							</Card>
 						</div>
 						<div className="w-full lg:w-1/3">
 							<Card className="p-6">
-								<div className="bg-slate-200 rounded-xl h-[280px] animate-pulse" />
+								<div className="bg-slate-200 rounded-xl h-[360px] animate-pulse" />
 							</Card>
 						</div>
 					</div>
@@ -163,8 +135,6 @@ export function LogPage() {
 	return (
 		<PageLayout>
 			<div className="space-y-6">
-				<CheckoutForm onSubmit={handleSubmit} />
-
 				<div className="flex flex-col lg:flex-row gap-6">
 					<div className="w-full lg:w-2/3">
 						<BarChart
